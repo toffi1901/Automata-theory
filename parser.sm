@@ -1,0 +1,78 @@
+%start Map1::Start
+%class AppClass
+%header AppClass.hpp
+
+%map Map1
+
+%%
+//State        Transition           End State         Action(s)
+Start{
+                on_slash            First_slash       {check_slash();}
+                on_default             Error             {log_error();}
+} 
+
+First_slash{
+                on_slash            Server_slash      {check_slash();}
+                on_default             Error             {log_error();}
+}
+
+Server_slash{
+                on_letter           Server_name        {check_first_sym(); add_to_server_name();} 
+                on_default             Error              {log_error();}
+}
+
+Server_name{
+                on_letter           Server_name         {add_to_server_name();}
+                on_digit            Server_name         {add_to_server_name();}
+                on_slash            Resourse_slash      {check_slash();}
+                on_default             Error            {log_error();}
+}
+
+Resourse_slash{
+                on_letter           Resourse_name       {valid_resourse_name(); }
+                on_digit            Resourse_name       {valid_resourse_name();}    
+                on_default             Error            {log_error();}
+} 
+
+Resourse_name{
+                on_letter       Resourse_name       {valid_resourse_name();}
+                on_digit        Resourse_name       {valid_resourse_name();}
+                on_dollar       Resourse_end        {valid_resourse_name();}  
+                on_slash        Catalog_slash       {check_slash();}
+                on_end          Success             {log_server();}
+                on_default      Error               {log_error();}
+}
+
+Resourse_end{
+    on_slash        Catalog_slash       {check_slash();}
+    on_end          Success             {log_server();}
+    on_default      Error               {log_error();}
+}
+
+Catalog_slash{
+                on_letter          Catalog_name         {valid_catalog_name();} 
+                on_digit           Catalog_name         {valid_catalog_name();}  
+                on_end             Success              {log_server();}
+                on_default            Error                {log_error();}
+}
+
+Catalog_name{
+                on_letter          Catalog_name         {valid_catalog_name();} 
+                on_digit           Catalog_name         {valid_catalog_name();}  
+                on_slash           Catalog_slash        {check_slash();}
+                on_end             Success              {log_server();}
+                on_default            Error                {log_error();}
+}
+
+Success {
+                on_default            Reset                {reset();}  
+}
+
+Error {
+                on_default            Reset                {reset();}  
+}
+
+Reset {
+                on_default             Start               {}  
+}
+%%
